@@ -1,6 +1,6 @@
-package br.com.fiap.entity;
+package br.com.fiap.domain.model;
 
-public class user {
+public class Usuario {
 
     private Long id;
     private String Username;
@@ -8,7 +8,7 @@ public class user {
     private String senha;
 
     //construtor
-    public user(Long id, String username, String email, String senha) {
+    public Usuario(Long id, String username, String email, String senha) {
         this.id = id;
         Username = username;
         this.email = email;
@@ -17,7 +17,7 @@ public class user {
 
 
     //construtor vazio
-    public user(){}
+    public Usuario(){}
 
 
     //getters e setters
