@@ -8,14 +8,14 @@ public class Mensagens {
     private String conteudo;
     private LocalDateTime dataHoraEnvio;
     private Boolean isUsuario;
-    private Usuario usuario;
+    private Chat chat;
 
-    public Mensagens(Long idMensagem, String conteudo, LocalDateTime dataHoraEnvio, Boolean isUsuario, Usuario usuario) {
+    public Mensagens(Long idMensagem, String conteudo, LocalDateTime dataHoraEnvio, Boolean isUsuario, Chat chat) {
         this.idMensagem = idMensagem;
         this.conteudo = conteudo;
         this.dataHoraEnvio = dataHoraEnvio;
         this.isUsuario = isUsuario;
-        this.usuario = usuario;
+        this.chat = chat;
     }
 
     public Mensagens() {}
@@ -48,11 +48,15 @@ public class Mensagens {
         return isUsuario;
     }
 
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
-    }
-
     public void setUsuario(Boolean usuario) {
         isUsuario = usuario;
+    }
+
+    public Chat getChat() {
+        return chat;
+    }
+
+    public void setChat(Chat chat) {
+        this.chat = chat;
     }
 }
