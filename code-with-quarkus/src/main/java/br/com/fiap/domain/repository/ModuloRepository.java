@@ -1,8 +1,6 @@
 package br.com.fiap.domain.repository;
 
-import br.com.fiap.domain.model.Mensagens;
 import br.com.fiap.domain.model.Modulo;
-
 import java.util.List;
 import java.util.Optional;
 
