@@ -1,6 +1,9 @@
 package br.com.fiap.domain.repository;
 
 import br.com.fiap.domain.model.Chat;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,6 +14,8 @@ public interface ChatRepository {
 
     List<Chat> listarTodos();
     Optional<Chat> buscarPorId(Long id);
+
+    Chat mapearChat(ResultSet resultSet) throws SQLException;
 
 
 }

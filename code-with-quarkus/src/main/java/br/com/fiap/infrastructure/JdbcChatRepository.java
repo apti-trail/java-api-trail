@@ -4,6 +4,7 @@ import br.com.fiap.domain.model.Chat;
 import br.com.fiap.domain.repository.ChatRepository;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -79,7 +80,30 @@ public class JdbcChatRepository implements ChatRepository {
 
     @Override
     public List<Chat> listarTodos() {
-        return List.of();
+        String sql = "SELECT ID_CHAT, TITULO_CHAT, DT_CRIACAO, DT_ATUALIZACAO, T_APTI_USUARIO_ID_USUARIO " +
+                "FROM T_APTI_CHAT ORDER BY DT_ATUALIZACAO DESC";
+
+        List<Chat> chats = new ArrayList<>();
+
+        try (Connection conn = this.databaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet resultSet = stmt.executeQuery()) {
+
+            while (resultSet.next()) {
+                Chat chat = mapearChat(resultSet);
+                chats.add(chat);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao listar chats", e);
+        }
+
+        return chats;
+    }
+
+    @Override
+    private Chat mapearChat(ResultSet resultSet) {
+        
     }
 
     @Override
