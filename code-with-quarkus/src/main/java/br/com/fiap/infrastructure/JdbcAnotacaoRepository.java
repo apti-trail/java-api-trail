@@ -63,7 +63,17 @@ public class JdbcAnotacaoRepository implements AnotacaoRepository {
 
     @Override
     public void excluirAnotacao(Long id) {
+        String sql = "DELETE FROM T_APTI_ANOTACAO WHERE ID_ANOTACAO = ?";
 
+        try (Connection conn = this.databaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, id);
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao excluir anotação com ID: " + id, e);
+        }
     }
 
     @Override
