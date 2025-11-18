@@ -5,6 +5,7 @@ import br.com.fiap.domain.repository.AnotacaoRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -78,11 +79,36 @@ public class JdbcAnotacaoRepository implements AnotacaoRepository {
 
     @Override
     public List<Anotacao> listarTodas() {
-        return List.of();
+        String sql = "SELECT ID_ANOTACAO, TITULO_ANOTACAO, CONTEUDO, DT_CRIACAO, T_APTI_USUÁRIO_ID_USUARIO " +
+                "FROM T_APTI_ANOTACAO ORDER BY DT_CRIACAO DESC";
+
+        List<Anotacao> anotacoes = new ArrayList<>();
+
+        try (Connection conn = this.databaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet resultSet = stmt.executeQuery()) {
+
+            while (resultSet.next()) {
+                Anotacao anotacao = mapearAnotacao(resultSet);
+                anotacoes.add(anotacao);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao listar anotações", e);
+        }
+
+        return anotacoes;
     }
 
     @Override
     public Optional<Anotacao> buscarPorId(Long id) {
         return Optional.empty();
     }
+
+    @Override
+    public Anotacao mapearAnotacao(ResultSet resultSet) {
+        return null;
+    }
+
+
 }
