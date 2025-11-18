@@ -36,7 +36,7 @@ public class Chat {
         this.titulo = titulo;
     }
 
-    public LocalDate getDataCriacao() {
+    public String getDataCriacao() {
         return dataCriacao;
     }
 
@@ -44,7 +44,7 @@ public class Chat {
         this.dataCriacao = dataCriacao;
     }
 
-    public LocalDate getDataAtualizacao() {
+    public String getDataAtualizacao() {
         return dataAtualizacao;
     }
 

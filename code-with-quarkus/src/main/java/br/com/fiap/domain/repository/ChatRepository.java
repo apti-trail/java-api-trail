@@ -6,7 +6,7 @@ import java.util.Optional;
 
 public interface ChatRepository {
 
-    ChatRepository salvarChat(Chat chat);
+    Chat salvarChat(Chat chat);
     void excluirChat(Long id);
 
     List<Chat> listarTodos();
