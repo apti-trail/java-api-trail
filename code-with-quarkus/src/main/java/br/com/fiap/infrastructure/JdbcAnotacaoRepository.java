@@ -102,6 +102,25 @@ public class JdbcAnotacaoRepository implements AnotacaoRepository {
 
     @Override
     public Optional<Anotacao> buscarPorId(Long id) {
+        String sql = "SELECT ID_ANOTACAO, TITULO_ANOTACAO, CONTEUDO, DT_CRIACAO, T_APTI_USUÁRIO_ID_USUARIO " +
+                "FROM T_APTI_ANOTACAO WHERE ID_ANOTACAO = ?";
+
+        try (Connection conn = this.databaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, id);
+
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                if (resultSet.next()) {
+                    Anotacao anotacao = mapearAnotacao(resultSet);
+                    return Optional.of(anotacao);
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao buscar anotação por ID: " + id, e);
+        }
+
         return Optional.empty();
     }
 
