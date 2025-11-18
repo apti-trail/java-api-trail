@@ -16,7 +16,7 @@ public class JdbcChatRepository implements ChatRepository {
         this.databaseConnection = databaseConnection;
     }
 
-    
+
     @Override
     public Chat salvarChat(Chat chat) {
         String sql;
@@ -64,7 +64,17 @@ public class JdbcChatRepository implements ChatRepository {
 
     @Override
     public void excluirChat(Long id) {
+        String sql = "DELETE FROM T_APTI_CHAT WHERE ID_CHAT = ?";
 
+        try (Connection conn = this.databaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, id);
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao excluir chat com ID: " + id, e);
+        }
     }
 
     @Override
