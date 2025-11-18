@@ -4,6 +4,7 @@ import br.com.fiap.domain.model.Chat;
 import br.com.fiap.domain.repository.ChatRepository;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -102,12 +103,46 @@ public class JdbcChatRepository implements ChatRepository {
     }
 
     @Override
-    private Chat mapearChat(ResultSet resultSet) {
-        
+    public Chat mapearChat(ResultSet resultSet) throws SQLException {
+        Chat chat = new Chat();
+        chat.setIdChat(resultSet.getLong("ID_CHAT"));
+        chat.setTitulo(resultSet.getString("TITULO_CHAT"));
+
+        Timestamp dataCriacao = resultSet.getTimestamp("DT_CRIACAO");
+        if (dataCriacao != null) {
+            chat.setDataCriacao(LocalDate.from(dataCriacao.toLocalDateTime()));
+        }
+
+        Timestamp dataAtualizacao = resultSet.getTimestamp("DT_ATUALIZACAO");
+        if (dataAtualizacao != null) {
+            chat.setDataAtualizacao(LocalDate.from(dataAtualizacao.toLocalDateTime()));
+        }
+
+        return chat;
     }
+
 
     @Override
     public Optional<Chat> buscarPorId(Long id) {
+        String sql = "SELECT ID_CHAT, TITULO_CHAT, DT_CRIACAO, DT_ATUALIZACAO, T_APTI_USUARIO_ID_USUARIO " +
+                "FROM T_APTI_CHAT WHERE ID_CHAT = ?";
+
+        try (Connection conn = this.databaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, id);
+
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                if (resultSet.next()) {
+                    Chat chat = mapearChat(resultSet);
+                    return Optional.of(chat);
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao buscar chat por ID: " + id, e);
+        }
+
         return Optional.empty();
     }
 }
