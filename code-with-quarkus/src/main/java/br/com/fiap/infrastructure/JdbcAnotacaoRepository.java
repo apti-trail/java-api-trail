@@ -125,9 +125,17 @@ public class JdbcAnotacaoRepository implements AnotacaoRepository {
     }
 
     @Override
-    public Anotacao mapearAnotacao(ResultSet resultSet) {
-        return null;
+    public Anotacao mapearAnotacao(ResultSet resultSet) throws SQLException {
+        Anotacao anotacao = new Anotacao();
+        anotacao.setIdAnotacao(resultSet.getLong("ID_ANOTACAO"));
+        anotacao.setTitulo(resultSet.getString("TITULO_ANOTACAO"));
+        anotacao.setConteudo(resultSet.getString("CONTEUDO"));
+
+        Date dataCriacao = resultSet.getDate("DT_CRIACAO");
+        if (dataCriacao != null) {
+            anotacao.setDataCriacao(dataCriacao.toLocalDate());
+        }
+
+        return anotacao;
     }
-
-
 }
