@@ -1,0 +1,78 @@
+package br.com.fiap.infrastructure;
+
+import br.com.fiap.domain.model.Anotacao;
+import br.com.fiap.domain.repository.AnotacaoRepository;
+import jakarta.enterprise.context.ApplicationScoped;
+
+import java.sql.*;
+import java.util.List;
+import java.util.Optional;
+
+@ApplicationScoped
+public class JdbcAnotacaoRepository implements AnotacaoRepository {
+
+
+    private final DatabaseConnection databaseConnection;
+
+    public JdbcAnotacaoRepository(DatabaseConnection databaseConnection) {
+        this.databaseConnection = databaseConnection;
+    }
+
+
+    @Override
+    public Anotacao salvar(Anotacao anotacao) {
+        String sql;
+        boolean isNovaAnotacao = anotacao.getIdAnotacao() == null;
+
+        if (isNovaAnotacao) {
+            sql = "INSERT INTO T_APTI_ANOTACAO (TITULO_ANOTACAO, CONTEUDO, DT_CRIACAO, T_APTI_USUÁRIO_ID_USUARIO) " +
+                    "VALUES (?, ?, ?, ?)";
+        } else {
+            sql = "UPDATE T_APTI_ANOTACAO SET TITULO_ANOTACAO = ?, CONTEUDO = ?, DT_CRIACAO = ?, " +
+                    "T_APTI_USUÁRIO_ID_USUARIO = ? WHERE ID_ANOTACAO = ?";
+        }
+
+        try (Connection conn = this.databaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql, new String[]{"ID_ANOTACAO"})) {
+
+            stmt.setString(1, anotacao.getTitulo());
+            stmt.setString(2, anotacao.getConteudo());
+            stmt.setDate(3, Date.valueOf(anotacao.getDataCriacao()));
+            stmt.setLong(4, anotacao.getUsuario().getId());
+
+            if (!isNovaAnotacao) {
+                stmt.setLong(5, anotacao.getIdAnotacao());
+            }
+
+            int affectedRows = stmt.executeUpdate();
+
+            if (isNovaAnotacao && affectedRows > 0) {
+                try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        anotacao.setIdAnotacao(generatedKeys.getLong(1));
+                    }
+                }
+            }
+
+            return anotacao;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao salvar anotação", e);
+        }
+    }
+
+    @Override
+    public void excluirAnotacao(Long id) {
+
+    }
+
+    @Override
+    public List<Anotacao> listarTodas() {
+        return List.of();
+    }
+
+    @Override
+    public Optional<Anotacao> buscarPorId(Long id) {
+        return Optional.empty();
+    }
+}
