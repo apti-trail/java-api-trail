@@ -65,7 +65,17 @@ public class JdbcTrilhaRepository implements TrilhaRepository {
 
     @Override
     public void excluir(Trilha trilha) {
+        String sql = "DELETE FROM T_APTI_TRILHA WHERE ID_TRILHA = ?";
 
+        try (Connection conn = this.databaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, trilha.getIdTrilha());
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao excluir trilha com ID: " + trilha.getIdTrilha(), e);
+        }
     }
 
     @Override
