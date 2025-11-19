@@ -146,5 +146,4 @@ public class JdbcTrilhaRepository implements TrilhaRepository {
         return trilha;
     }
 
-
 }
