@@ -75,6 +75,24 @@ public class JdbcUsuarioRepository implements UsuarioRepository {
 
     @Override
     public Optional<Usuario> buscarPorId(Long id) {
+        String sql = "SELECT ID_USUARIO, NM_USUARIO, EMAIL, SENHA FROM T_APTI_USUARIO WHERE ID_USUARIO = ?";
+
+        try (Connection conn = this.databaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, id);
+
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                if (resultSet.next()) {
+                    Usuario usuario = mapearUsuario(resultSet);
+                    return Optional.of(usuario);
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao buscar usuário por ID: " + id, e);
+        }
+
         return Optional.empty();
     }
 
