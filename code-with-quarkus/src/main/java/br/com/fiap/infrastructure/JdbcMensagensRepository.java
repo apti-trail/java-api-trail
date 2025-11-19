@@ -4,6 +4,7 @@ import br.com.fiap.domain.model.Mensagens;
 import br.com.fiap.domain.repository.MensagensRepository;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -76,7 +77,25 @@ public class JdbcMensagensRepository implements MensagensRepository {
 
     @Override
     public List<Mensagens> listarTodas() {
-        return List.of();
+        String sql = "SELECT ID_MENSAGEM, CONTEUDO, DT_HORA_ENVIO, IS_USUARIO, T_APTI_CHAT_ID_CHAT " +
+                "FROM T_APTI_MENSAGENS ORDER BY DT_HORA_ENVIO ASC";
+
+        List<Mensagens> mensagens = new ArrayList<>();
+
+        try (Connection conn = this.databaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet resultSet = stmt.executeQuery()) {
+
+            while (resultSet.next()) {
+                Mensagens mensagem = mapearMensagem(resultSet);
+                mensagens.add(mensagem);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao listar mensagens", e);
+        }
+
+        return mensagens;
     }
 
     @Override
