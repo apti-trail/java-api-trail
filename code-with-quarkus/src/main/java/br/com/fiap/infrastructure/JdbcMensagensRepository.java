@@ -100,6 +100,25 @@ public class JdbcMensagensRepository implements MensagensRepository {
 
     @Override
     public Optional<Mensagens> buscarPorId(Long id) {
+        String sql = "SELECT ID_MENSAGEM, CONTEUDO, DT_HORA_ENVIO, IS_USUARIO, T_APTI_CHAT_ID_CHAT " +
+                "FROM T_APTI_MENSAGENS WHERE ID_MENSAGEM = ?";
+
+        try (Connection conn = this.databaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, id);
+
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                if (resultSet.next()) {
+                    Mensagens mensagem = mapearMensagem(resultSet);
+                    return Optional.of(mensagem);
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao buscar mensagem por ID: " + id, e);
+        }
+
         return Optional.empty();
     }
 }
