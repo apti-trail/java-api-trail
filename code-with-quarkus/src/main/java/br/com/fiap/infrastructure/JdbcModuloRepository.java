@@ -107,6 +107,28 @@ public class JdbcModuloRepository implements ModuloRepository {
 
     @Override
     public Optional<Modulo> buscarPorId(Long id) {
+        String sql = "SELECT ID_MODULO, TITULO_MODULO, CONTEUDO, ORDEM, CONCLUIDO, DT_CONCLUSAO, T_APTI_TRILHA_ID_TRILHA " +
+                "FROM T_APTI_MODULO WHERE ID_MODULO = ?";
+
+        try (Connection conn = this.databaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, id);
+
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                if (resultSet.next()) {
+                    Modulo modulo = mapearModulo(resultSet);
+                    return Optional.of(modulo);
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao buscar módulo por ID: " + id, e);
+        }
+
         return Optional.empty();
     }
+
+
+    
 }
