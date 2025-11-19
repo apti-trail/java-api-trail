@@ -126,6 +126,25 @@ public class JdbcTrilhaRepository implements TrilhaRepository {
         return Optional.empty();
     }
 
+    @Override
+    public Trilha mapearTrilha(ResultSet resultSet) throws SQLException {
+        Trilha trilha = new Trilha();
+        trilha.setIdTrilha(resultSet.getLong("ID_TRILHA"));
+        trilha.setTitulo(resultSet.getString("TITULO_TRILHA"));
+        trilha.setProgresso(resultSet.getInt("PROGRESSO"));
 
-    
+        Date dataCriacao = resultSet.getDate("DT_CRIACAO");
+        if (dataCriacao != null) {
+            trilha.setDataCriacao(dataCriacao.toLocalDate());
+        }
+
+        Date dataAtualizacao = resultSet.getDate("DT_ATUALIZACAO");
+        if (dataAtualizacao != null) {
+            trilha.setDataAtualizacao(dataAtualizacao.toLocalDate());
+        }
+
+        return trilha;
+    }
+
+
 }
