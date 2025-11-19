@@ -4,6 +4,7 @@ import br.com.fiap.domain.model.Modulo;
 import br.com.fiap.domain.repository.ModuloRepository;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -129,6 +130,21 @@ public class JdbcModuloRepository implements ModuloRepository {
         return Optional.empty();
     }
 
+    public Modulo mapearModulo(ResultSet resultSet) throws SQLException {
+        Modulo modulo = new Modulo();
+        modulo.setIdModulo(resultSet.getLong("ID_MODULO"));
+        modulo.setTitulo(resultSet.getString("TITULO_MODULO"));
+        modulo.setConteudo(resultSet.getString("CONTEUDO"));
+        modulo.setOrdem(resultSet.getInt("ORDEM"));
 
-    
+        String concluido = resultSet.getString("CONCLUIDO");
+        modulo.setConcluido("S".equals(concluido));
+
+        Timestamp dataConclusao = resultSet.getTimestamp("DT_CONCLUSAO");
+        if (dataConclusao != null) {
+            modulo.setDataConclusao(LocalDate.from(dataConclusao.toLocalDateTime()));
+        }
+
+        return modulo;
+    }
 }
