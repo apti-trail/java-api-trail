@@ -121,4 +121,22 @@ public class JdbcMensagensRepository implements MensagensRepository {
 
         return Optional.empty();
     }
+
+    @Override
+    public Mensagens mapearMensagem(ResultSet resultSet) throws SQLException {
+        Mensagens mensagem = new Mensagens();
+        mensagem.setIdMensagem(resultSet.getLong("ID_MENSAGEM"));
+        mensagem.setConteudo(resultSet.getString("CONTEUDO"));
+
+        Timestamp dataHoraEnvio = resultSet.getTimestamp("DT_HORA_ENVIO");
+        if (dataHoraEnvio != null) {
+            mensagem.setDataHoraEnvio(dataHoraEnvio.toLocalDateTime());
+        }
+
+        String isUsuario = resultSet.getString("IS_USUARIO");
+        mensagem.setIsUsuario("S".equals(isUsuario));
+
+        return mensagem;
+    }
+
 }
