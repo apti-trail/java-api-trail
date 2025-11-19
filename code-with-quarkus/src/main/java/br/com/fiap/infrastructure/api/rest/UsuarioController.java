@@ -4,7 +4,6 @@ import br.com.fiap.interfaces.dto.LoginDTO;
 import br.com.fiap.interfaces.dto.UsuarioDTO;
 import br.com.fiap.domain.model.Usuario;
 import br.com.fiap.domain.service.UsuarioService;
-import jakarta.enterprise.inject.Produces;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -26,7 +25,7 @@ public class UsuarioController {
             Usuario usuario = new Usuario();
             usuario.setUsername(usuarioDTO.getUsername());
             usuario.setEmail(usuarioDTO.getEmail());
-            usuario.setSenha("senha_default"); // Em produção, usar hash + tratamento específico
+            usuario.setSenha("senha_default");
 
             Usuario usuarioSalvo = usuarioService.salvar(usuario);
             UsuarioDTO responseDTO = toDTO(usuarioSalvo);
