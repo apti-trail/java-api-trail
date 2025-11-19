@@ -4,6 +4,7 @@ import br.com.fiap.domain.model.Trilha;
 import br.com.fiap.domain.repository.TrilhaRepository;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -80,7 +81,25 @@ public class JdbcTrilhaRepository implements TrilhaRepository {
 
     @Override
     public List<Trilha> listarTodas() {
-        return List.of();
+        String sql = "SELECT ID_TRILHA, TITULO_TRILHA, PROGRESSO, DT_CRIACAO, DT_ATUALIZACAO, T_APTI_USUARIO_ID_USUARIO " +
+                "FROM T_APTI_TRILHA ORDER BY DT_ATUALIZACAO DESC";
+
+        List<Trilha> trilhas = new ArrayList<>();
+
+        try (Connection conn = this.databaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet resultSet = stmt.executeQuery()) {
+
+            while (resultSet.next()) {
+                Trilha trilha = mapearTrilha(resultSet);
+                trilhas.add(trilha);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao listar trilhas", e);
+        }
+
+        return trilhas;
     }
 
     @Override
