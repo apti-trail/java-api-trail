@@ -4,6 +4,7 @@ import br.com.fiap.domain.model.Modulo;
 import br.com.fiap.domain.repository.ModuloRepository;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -83,7 +84,25 @@ public class JdbcModuloRepository implements ModuloRepository {
 
     @Override
     public List<Modulo> listarTodos() {
-        return List.of();
+        String sql = "SELECT ID_MODULO, TITULO_MODULO, CONTEUDO, ORDEM, CONCLUIDO, DT_CONCLUSAO, T_APTI_TRILHA_ID_TRILHA " +
+                "FROM T_APTI_MODULO ORDER BY ORDEM ASC";
+
+        List<Modulo> modulos = new ArrayList<>();
+
+        try (Connection conn = this.databaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet resultSet = stmt.executeQuery()) {
+
+            while (resultSet.next()) {
+                Modulo modulo = mapearModulo(resultSet);
+                modulos.add(modulo);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao listar módulos", e);
+        }
+
+        return modulos;
     }
 
     @Override
