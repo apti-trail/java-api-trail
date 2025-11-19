@@ -153,5 +153,4 @@ public class JdbcUsuarioRepository implements UsuarioRepository {
         return usuario;
     }
 
-
 }
