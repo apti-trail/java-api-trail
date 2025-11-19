@@ -98,8 +98,27 @@ public class JdbcUsuarioRepository implements UsuarioRepository {
 
     @Override
     public Optional<Usuario> buscarPorEmail(String email) {
+        String sql = "SELECT ID_USUARIO, NM_USUARIO, EMAIL, SENHA FROM T_APTI_USUARIO WHERE EMAIL = ?";
+
+        try (Connection conn = this.databaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, email);
+
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                if (resultSet.next()) {
+                    Usuario usuario = mapearUsuario(resultSet);
+                    return Optional.of(usuario);
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao buscar usuário por email: " + email, e);
+        }
+
         return Optional.empty();
     }
+    
 
     @Override
     public List<Usuario> listarTodos() {
