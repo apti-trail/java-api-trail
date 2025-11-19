@@ -44,11 +44,11 @@ public class Mensagens {
         this.dataHoraEnvio = dataHoraEnvio;
     }
 
-    public Boolean getUsuario() {
+    public Boolean getIsUsuario() {
         return isUsuario;
     }
 
-    public void setUsuario(Boolean usuario) {
+    public void setIsUsuario(Boolean usuario) {
         isUsuario = usuario;
     }
 
