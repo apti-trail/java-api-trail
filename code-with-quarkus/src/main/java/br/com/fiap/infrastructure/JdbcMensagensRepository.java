@@ -60,8 +60,19 @@ public class JdbcMensagensRepository implements MensagensRepository {
 
     @Override
     public void excluir(Mensagens mensagens) {
+        String sql = "DELETE FROM T_APTI_MENSAGENS WHERE ID_MENSAGEM = ?";
 
+        try (Connection conn = this.databaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, mensagens.getIdMensagem());
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao excluir mensagem com ID: " + mensagens.getIdMensagem(), e);
+        }
     }
+
 
     @Override
     public List<Mensagens> listarTodas() {
