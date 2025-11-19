@@ -68,7 +68,17 @@ public class JdbcModuloRepository implements ModuloRepository {
 
     @Override
     public void excluir(Modulo modulo) {
+        String sql = "DELETE FROM T_APTI_MODULO WHERE ID_MODULO = ?";
 
+        try (Connection conn = this.databaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, modulo.getIdModulo());
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao excluir módulo com ID: " + modulo.getIdModulo(), e);
+        }
     }
 
     @Override
