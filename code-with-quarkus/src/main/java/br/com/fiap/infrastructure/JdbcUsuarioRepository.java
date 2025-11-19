@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -118,10 +119,30 @@ public class JdbcUsuarioRepository implements UsuarioRepository {
 
         return Optional.empty();
     }
-    
+
 
     @Override
     public List<Usuario> listarTodos() {
-        return List.of();
+        String sql = "SELECT ID_USUARIO, NM_USUARIO, EMAIL, SENHA FROM T_APTI_USUARIO ORDER BY NM_USUARIO";
+
+        List<Usuario> usuarios = new ArrayList<>();
+
+        try (Connection conn = this.databaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet resultSet = stmt.executeQuery()) {
+
+            while (resultSet.next()) {
+                Usuario usuario = mapearUsuario(resultSet);
+                usuarios.add(usuario);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao listar usuários", e);
+        }
+
+        return usuarios;
     }
+
+    
+
 }
