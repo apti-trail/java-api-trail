@@ -104,6 +104,28 @@ public class JdbcTrilhaRepository implements TrilhaRepository {
 
     @Override
     public Optional<Trilha> buscarPorId(Long id) {
+        String sql = "SELECT ID_TRILHA, TITULO_TRILHA, PROGRESSO, DT_CRIACAO, DT_ATUALIZACAO, T_APTI_USUARIO_ID_USUARIO " +
+                "FROM T_APTI_TRILHA WHERE ID_TRILHA = ?";
+
+        try (Connection conn = this.databaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, id);
+
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                if (resultSet.next()) {
+                    Trilha trilha = mapearTrilha(resultSet);
+                    return Optional.of(trilha);
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao buscar trilha por ID: " + id, e);
+        }
+
         return Optional.empty();
     }
+
+
+    
 }
