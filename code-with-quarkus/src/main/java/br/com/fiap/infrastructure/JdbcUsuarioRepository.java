@@ -143,6 +143,15 @@ public class JdbcUsuarioRepository implements UsuarioRepository {
         return usuarios;
     }
 
-    
+    @Override
+    public Usuario mapearUsuario(ResultSet resultSet) throws SQLException {
+        Usuario usuario = new Usuario();
+        usuario.setId(resultSet.getLong("ID_USUARIO"));
+        usuario.setUsername(resultSet.getString("NM_USUARIO"));
+        usuario.setEmail(resultSet.getString("EMAIL"));
+        usuario.setSenha(resultSet.getString("SENHA"));
+        return usuario;
+    }
+
 
 }
