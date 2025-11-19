@@ -60,7 +60,17 @@ public class JdbcUsuarioRepository implements UsuarioRepository {
 
     @Override
     public void excluir(Long id) {
+        String sql = "DELETE FROM T_APTI_USUARIO WHERE ID_USUARIO = ?";
 
+        try (Connection conn = this.databaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, id);
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao excluir usuário com ID: " + id, e);
+        }
     }
 
     @Override
