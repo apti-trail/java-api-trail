@@ -2,6 +2,7 @@ package br.com.fiap.infrastructure;
 
 import br.com.fiap.domain.model.Chat;
 import br.com.fiap.domain.repository.ChatRepository;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@ApplicationScoped
 public class JdbcChatRepository implements ChatRepository {
 
 
@@ -37,12 +39,12 @@ public class JdbcChatRepository implements ChatRepository {
 
             if (isNovoChat) {
                 stmt.setString(1, chat.getTitulo());
-                stmt.setTimestamp(2, Timestamp.valueOf(chat.getDataCriacao()));
-                stmt.setTimestamp(3, Timestamp.valueOf(chat.getDataAtualizacao()));
+                stmt.setTimestamp(2, Timestamp.valueOf(chat.getDataCriacao().atStartOfDay()));
+                stmt.setTimestamp(3, Timestamp.valueOf(chat.getDataAtualizacao().atStartOfDay()));
                 stmt.setLong(4, chat.getUsuario().getId());
             } else {
                 stmt.setString(1, chat.getTitulo());
-                stmt.setTimestamp(2, Timestamp.valueOf(chat.getDataAtualizacao()));
+                stmt.setTimestamp(2, Timestamp.valueOf(chat.getDataAtualizacao().atStartOfDay()));
                 stmt.setLong(3, chat.getUsuario().getId());
                 stmt.setLong(4, chat.getIdChat());
             }

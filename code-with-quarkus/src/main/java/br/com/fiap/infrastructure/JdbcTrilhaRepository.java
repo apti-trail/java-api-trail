@@ -2,12 +2,14 @@ package br.com.fiap.infrastructure;
 
 import br.com.fiap.domain.model.Trilha;
 import br.com.fiap.domain.repository.TrilhaRepository;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@ApplicationScoped
 public class JdbcTrilhaRepository implements TrilhaRepository {
 
     private final DatabaseConnection databaseConnection;

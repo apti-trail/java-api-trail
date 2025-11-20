@@ -2,6 +2,7 @@ package br.com.fiap.infrastructure;
 
 import br.com.fiap.domain.model.Usuario;
 import br.com.fiap.domain.repository.UsuarioRepository;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@ApplicationScoped
 public class JdbcUsuarioRepository implements UsuarioRepository {
 
     private final DatabaseConnection databaseConnection;
