@@ -1,24 +1,26 @@
-package br.com.fiap.domain.model;
+package br.com.fiap.interfaces.dto;
 
 import java.time.LocalDate;
 
-public class Chat {
-
+public class ChatDTO {
     private Long idChat;
     private String titulo;
     private LocalDate dataCriacao;
     private LocalDate dataAtualizacao;
-    private Usuario usuario;
+    private Long usuarioId;
 
-    public Chat(Long idChat, String titulo, LocalDate dataCriacao, LocalDate dataAtualizacao, Usuario usuario) {
+
+    public ChatDTO() {
+    }
+
+    public ChatDTO(Long idChat, String titulo, LocalDate dataCriacao, LocalDate dataAtualizacao, Long usuarioId) {
         this.idChat = idChat;
         this.titulo = titulo;
         this.dataCriacao = dataCriacao;
         this.dataAtualizacao = dataAtualizacao;
-        this.usuario = usuario;
+        this.usuarioId = usuarioId;
     }
 
-    public Chat() {}
 
     public Long getIdChat() {
         return idChat;
@@ -52,11 +54,11 @@ public class Chat {
         this.dataAtualizacao = dataAtualizacao;
     }
 
-    public Usuario getUsuario() {
-        return usuario;
+    public Long getUsuarioId() {
+        return usuarioId;
     }
 
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
+    public void setUsuarioId(Long usuarioId) {
+        this.usuarioId = usuarioId;
     }
 }

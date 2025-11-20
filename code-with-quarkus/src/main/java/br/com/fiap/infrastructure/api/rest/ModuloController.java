@@ -38,13 +38,20 @@ public class ModuloController {
             modulo.setTrilha(trilha);
 
             Modulo moduloSalvo = moduloService.salvarModulo(modulo);
-            return Response.status(Response.Status.CREATED)
-                    .entity(toDTO(moduloSalvo))
-                    .build();
+
+            ModuloDTO responseDTO = new ModuloDTO();
+            responseDTO.setIdModulo(moduloSalvo.getIdModulo());
+            responseDTO.setTitulo(moduloSalvo.getTitulo());
+            responseDTO.setConteudo(moduloSalvo.getConteudo());
+            responseDTO.setOrdem(moduloSalvo.getOrdem());
+            responseDTO.setConcluido(moduloSalvo.isConcluido());
+            responseDTO.setDataConclusao(moduloSalvo.getDataConclusao());
+            responseDTO.setTrilhaId(moduloSalvo.getTrilha().getIdTrilha());
+
+            return Response.status(Response.Status.CREATED).entity(responseDTO).build();
         } catch (Exception e) {
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("Erro ao criar módulo: " + e.getMessage())
-                    .build();
+                    .entity("Erro ao criar módulo: " + e.getMessage()).build();
         }
     }
 
@@ -53,13 +60,22 @@ public class ModuloController {
     public Response buscarModulo(@PathParam("id") Long id) {
         try {
             return moduloService.buscarPorId(id)
-                    .map(this::toDTO)
+                    .map(modulo -> {
+                        ModuloDTO dto = new ModuloDTO();
+                        dto.setIdModulo(modulo.getIdModulo());
+                        dto.setTitulo(modulo.getTitulo());
+                        dto.setConteudo(modulo.getConteudo());
+                        dto.setOrdem(modulo.getOrdem());
+                        dto.setConcluido(modulo.isConcluido());
+                        dto.setDataConclusao(modulo.getDataConclusao());
+                        dto.setTrilhaId(modulo.getTrilha().getIdTrilha());
+                        return dto;
+                    })
                     .map(dto -> Response.ok(dto).build())
                     .orElse(Response.status(Response.Status.NOT_FOUND).build());
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Erro ao buscar módulo: " + e.getMessage())
-                    .build();
+                    .entity("Erro ao buscar módulo: " + e.getMessage()).build();
         }
     }
 
@@ -67,13 +83,22 @@ public class ModuloController {
     public Response listarModulos() {
         try {
             List<ModuloDTO> modulos = moduloService.listarTodos().stream()
-                    .map(this::toDTO)
+                    .map(modulo -> {
+                        ModuloDTO dto = new ModuloDTO();
+                        dto.setIdModulo(modulo.getIdModulo());
+                        dto.setTitulo(modulo.getTitulo());
+                        dto.setConteudo(modulo.getConteudo());
+                        dto.setOrdem(modulo.getOrdem());
+                        dto.setConcluido(modulo.isConcluido());
+                        dto.setDataConclusao(modulo.getDataConclusao());
+                        dto.setTrilhaId(modulo.getTrilha().getIdTrilha());
+                        return dto;
+                    })
                     .collect(Collectors.toList());
             return Response.ok(modulos).build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Erro ao listar módulos: " + e.getMessage())
-                    .build();
+                    .entity("Erro ao listar módulos: " + e.getMessage()).build();
         }
     }
 
@@ -85,8 +110,7 @@ public class ModuloController {
             return Response.ok().build();
         } catch (Exception e) {
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("Erro ao marcar módulo como concluído: " + e.getMessage())
-                    .build();
+                    .entity("Erro ao marcar módulo como concluído: " + e.getMessage()).build();
         }
     }
 
@@ -102,20 +126,7 @@ public class ModuloController {
                     .orElse(Response.status(Response.Status.NOT_FOUND).build());
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Erro ao excluir módulo: " + e.getMessage())
-                    .build();
+                    .entity("Erro ao excluir módulo: " + e.getMessage()).build();
         }
-    }
-
-    private ModuloDTO toDTO(Modulo modulo) {
-        ModuloDTO dto = new ModuloDTO();
-        dto.setIdModulo(modulo.getIdModulo());
-        dto.setTitulo(modulo.getTitulo());
-        dto.setConteudo(modulo.getConteudo());
-        dto.setOrdem(modulo.getOrdem());
-        dto.setConcluido(modulo.isConcluido());
-        dto.setDataConclusao(modulo.getDataConclusao());
-        dto.setTrilhaId(modulo.getTrilha().getIdTrilha());
-        return dto;
     }
 }

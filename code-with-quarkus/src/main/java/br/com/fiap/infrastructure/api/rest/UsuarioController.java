@@ -28,15 +28,17 @@ public class UsuarioController {
             usuario.setSenha("senha_default");
 
             Usuario usuarioSalvo = usuarioService.salvar(usuario);
-            UsuarioDTO responseDTO = toDTO(usuarioSalvo);
 
-            return Response.status(Response.Status.CREATED)
-                    .entity(responseDTO)
-                    .build();
+            UsuarioDTO responseDTO = new UsuarioDTO(
+                    usuarioSalvo.getId(),
+                    usuarioSalvo.getUsername(),
+                    usuarioSalvo.getEmail()
+            );
+
+            return Response.status(Response.Status.CREATED).entity(responseDTO).build();
         } catch (Exception e) {
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("Erro ao criar usuário: " + e.getMessage())
-                    .build();
+                    .entity("Erro ao criar usuário: " + e.getMessage()).build();
         }
     }
 
@@ -45,13 +47,12 @@ public class UsuarioController {
     public Response buscarUsuario(@PathParam("id") Long id) {
         try {
             return usuarioService.buscarPorId(id)
-                    .map(this::toDTO)
+                    .map(usuario -> new UsuarioDTO(usuario.getId(), usuario.getUsername(), usuario.getEmail()))
                     .map(dto -> Response.ok(dto).build())
                     .orElse(Response.status(Response.Status.NOT_FOUND).build());
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Erro ao buscar usuário: " + e.getMessage())
-                    .build();
+                    .entity("Erro ao buscar usuário: " + e.getMessage()).build();
         }
     }
 
@@ -59,13 +60,12 @@ public class UsuarioController {
     public Response listarUsuarios() {
         try {
             List<UsuarioDTO> usuarios = usuarioService.listarTodos().stream()
-                    .map(this::toDTO)
+                    .map(usuario -> new UsuarioDTO(usuario.getId(), usuario.getUsername(), usuario.getEmail()))
                     .collect(Collectors.toList());
             return Response.ok(usuarios).build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Erro ao listar usuários: " + e.getMessage())
-                    .build();
+                    .entity("Erro ao listar usuários: " + e.getMessage()).build();
         }
     }
 
@@ -78,13 +78,17 @@ public class UsuarioController {
                         usuario.setUsername(usuarioDTO.getUsername());
                         usuario.setEmail(usuarioDTO.getEmail());
                         Usuario usuarioAtualizado = usuarioService.salvar(usuario);
-                        return Response.ok(toDTO(usuarioAtualizado)).build();
+                        UsuarioDTO responseDTO = new UsuarioDTO(
+                                usuarioAtualizado.getId(),
+                                usuarioAtualizado.getUsername(),
+                                usuarioAtualizado.getEmail()
+                        );
+                        return Response.ok(responseDTO).build();
                     })
                     .orElse(Response.status(Response.Status.NOT_FOUND).build());
         } catch (Exception e) {
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("Erro ao atualizar usuário: " + e.getMessage())
-                    .build();
+                    .entity("Erro ao atualizar usuário: " + e.getMessage()).build();
         }
     }
 
@@ -96,8 +100,7 @@ public class UsuarioController {
             return Response.noContent().build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Erro ao excluir usuário: " + e.getMessage())
-                    .build();
+                    .entity("Erro ao excluir usuário: " + e.getMessage()).build();
         }
     }
 
@@ -108,25 +111,15 @@ public class UsuarioController {
             boolean loginValido = usuarioService.validarLogin(loginDTO.getEmail(), loginDTO.getSenha());
             if (loginValido) {
                 return usuarioService.buscarPorEmail(loginDTO.getEmail())
-                        .map(this::toDTO)
+                        .map(usuario -> new UsuarioDTO(usuario.getId(), usuario.getUsername(), usuario.getEmail()))
                         .map(dto -> Response.ok(dto).build())
                         .orElse(Response.status(Response.Status.UNAUTHORIZED).build());
             }
             return Response.status(Response.Status.UNAUTHORIZED)
-                    .entity("Credenciais inválidas")
-                    .build();
+                    .entity("Credenciais inválidas").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Erro ao realizar login: " + e.getMessage())
-                    .build();
+                    .entity("Erro ao realizar login: " + e.getMessage()).build();
         }
-    }
-
-    private UsuarioDTO toDTO(Usuario usuario) {
-        return new UsuarioDTO(
-                usuario.getId(),
-                usuario.getUsername(),
-                usuario.getEmail()
-        );
     }
 }

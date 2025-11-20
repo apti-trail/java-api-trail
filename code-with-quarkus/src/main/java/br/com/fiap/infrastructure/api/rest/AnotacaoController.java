@@ -35,13 +35,18 @@ public class AnotacaoController {
             anotacao.setUsuario(usuario);
 
             Anotacao anotacaoSalva = anotacaoService.salvar(anotacao);
-            return Response.status(Response.Status.CREATED)
-                    .entity(toDTO(anotacaoSalva))
-                    .build();
+
+            AnotacaoDTO responseDTO = new AnotacaoDTO();
+            responseDTO.setIdAnotacao(anotacaoSalva.getIdAnotacao());
+            responseDTO.setTitulo(anotacaoSalva.getTitulo());
+            responseDTO.setConteudo(anotacaoSalva.getConteudo());
+            responseDTO.setDataCriacao(anotacaoSalva.getDataCriacao());
+            responseDTO.setUsuarioId(anotacaoSalva.getUsuario().getId());
+
+            return Response.status(Response.Status.CREATED).entity(responseDTO).build();
         } catch (Exception e) {
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("Erro ao criar anotação: " + e.getMessage())
-                    .build();
+                    .entity("Erro ao criar anotação: " + e.getMessage()).build();
         }
     }
 
@@ -50,13 +55,20 @@ public class AnotacaoController {
     public Response buscarAnotacao(@PathParam("id") Long id) {
         try {
             return anotacaoService.buscarPorId(id)
-                    .map(this::toDTO)
+                    .map(anotacao -> {
+                        AnotacaoDTO dto = new AnotacaoDTO();
+                        dto.setIdAnotacao(anotacao.getIdAnotacao());
+                        dto.setTitulo(anotacao.getTitulo());
+                        dto.setConteudo(anotacao.getConteudo());
+                        dto.setDataCriacao(anotacao.getDataCriacao());
+                        dto.setUsuarioId(anotacao.getUsuario().getId());
+                        return dto;
+                    })
                     .map(dto -> Response.ok(dto).build())
                     .orElse(Response.status(Response.Status.NOT_FOUND).build());
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Erro ao buscar anotação: " + e.getMessage())
-                    .build();
+                    .entity("Erro ao buscar anotação: " + e.getMessage()).build();
         }
     }
 
@@ -64,13 +76,20 @@ public class AnotacaoController {
     public Response listarAnotacoes() {
         try {
             List<AnotacaoDTO> anotacoes = anotacaoService.listarTodas().stream()
-                    .map(this::toDTO)
+                    .map(anotacao -> {
+                        AnotacaoDTO dto = new AnotacaoDTO();
+                        dto.setIdAnotacao(anotacao.getIdAnotacao());
+                        dto.setTitulo(anotacao.getTitulo());
+                        dto.setConteudo(anotacao.getConteudo());
+                        dto.setDataCriacao(anotacao.getDataCriacao());
+                        dto.setUsuarioId(anotacao.getUsuario().getId());
+                        return dto;
+                    })
                     .collect(Collectors.toList());
             return Response.ok(anotacoes).build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Erro ao listar anotações: " + e.getMessage())
-                    .build();
+                    .entity("Erro ao listar anotações: " + e.getMessage()).build();
         }
     }
 
@@ -82,18 +101,7 @@ public class AnotacaoController {
             return Response.noContent().build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Erro ao excluir anotação: " + e.getMessage())
-                    .build();
+                    .entity("Erro ao excluir anotação: " + e.getMessage()).build();
         }
-    }
-
-    private AnotacaoDTO toDTO(Anotacao anotacao) {
-        AnotacaoDTO dto = new AnotacaoDTO();
-        dto.setIdAnotacao(anotacao.getIdAnotacao());
-        dto.setTitulo(anotacao.getTitulo());
-        dto.setConteudo(anotacao.getConteudo());
-        dto.setDataCriacao(anotacao.getDataCriacao());
-        dto.setUsuarioId(anotacao.getUsuario().getId());
-        return dto;
     }
 }

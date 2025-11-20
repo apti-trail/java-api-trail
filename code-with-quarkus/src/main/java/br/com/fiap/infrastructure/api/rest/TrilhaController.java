@@ -35,13 +35,19 @@ public class TrilhaController {
             trilha.setUsuario(usuario);
 
             Trilha trilhaSalva = trilhaService.salvarTrilha(trilha);
-            return Response.status(Response.Status.CREATED)
-                    .entity(toDTO(trilhaSalva))
-                    .build();
+
+            TrilhaDTO responseDTO = new TrilhaDTO();
+            responseDTO.setIdTrilha(trilhaSalva.getIdTrilha());
+            responseDTO.setTitulo(trilhaSalva.getTitulo());
+            responseDTO.setProgresso(trilhaSalva.getProgresso());
+            responseDTO.setDataCriacao(trilhaSalva.getDataCriacao());
+            responseDTO.setDataAtualizacao(trilhaSalva.getDataAtualizacao());
+            responseDTO.setUsuarioId(trilhaSalva.getUsuario().getId());
+
+            return Response.status(Response.Status.CREATED).entity(responseDTO).build();
         } catch (Exception e) {
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("Erro ao criar trilha: " + e.getMessage())
-                    .build();
+                    .entity("Erro ao criar trilha: " + e.getMessage()).build();
         }
     }
 
@@ -50,13 +56,21 @@ public class TrilhaController {
     public Response buscarTrilha(@PathParam("id") Long id) {
         try {
             return trilhaService.buscarPorId(id)
-                    .map(this::toDTO)
+                    .map(trilha -> {
+                        TrilhaDTO dto = new TrilhaDTO();
+                        dto.setIdTrilha(trilha.getIdTrilha());
+                        dto.setTitulo(trilha.getTitulo());
+                        dto.setProgresso(trilha.getProgresso());
+                        dto.setDataCriacao(trilha.getDataCriacao());
+                        dto.setDataAtualizacao(trilha.getDataAtualizacao());
+                        dto.setUsuarioId(trilha.getUsuario().getId());
+                        return dto;
+                    })
                     .map(dto -> Response.ok(dto).build())
                     .orElse(Response.status(Response.Status.NOT_FOUND).build());
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Erro ao buscar trilha: " + e.getMessage())
-                    .build();
+                    .entity("Erro ao buscar trilha: " + e.getMessage()).build();
         }
     }
 
@@ -64,13 +78,21 @@ public class TrilhaController {
     public Response listarTrilhas() {
         try {
             List<TrilhaDTO> trilhas = trilhaService.listarTodas().stream()
-                    .map(this::toDTO)
+                    .map(trilha -> {
+                        TrilhaDTO dto = new TrilhaDTO();
+                        dto.setIdTrilha(trilha.getIdTrilha());
+                        dto.setTitulo(trilha.getTitulo());
+                        dto.setProgresso(trilha.getProgresso());
+                        dto.setDataCriacao(trilha.getDataCriacao());
+                        dto.setDataAtualizacao(trilha.getDataAtualizacao());
+                        dto.setUsuarioId(trilha.getUsuario().getId());
+                        return dto;
+                    })
                     .collect(Collectors.toList());
             return Response.ok(trilhas).build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Erro ao listar trilhas: " + e.getMessage())
-                    .build();
+                    .entity("Erro ao listar trilhas: " + e.getMessage()).build();
         }
     }
 
@@ -82,8 +104,7 @@ public class TrilhaController {
             return Response.ok().build();
         } catch (Exception e) {
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("Erro ao atualizar progresso: " + e.getMessage())
-                    .build();
+                    .entity("Erro ao atualizar progresso: " + e.getMessage()).build();
         }
     }
 
@@ -99,19 +120,7 @@ public class TrilhaController {
                     .orElse(Response.status(Response.Status.NOT_FOUND).build());
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Erro ao excluir trilha: " + e.getMessage())
-                    .build();
+                    .entity("Erro ao excluir trilha: " + e.getMessage()).build();
         }
-    }
-
-    private TrilhaDTO toDTO(Trilha trilha) {
-        TrilhaDTO dto = new TrilhaDTO();
-        dto.setIdTrilha(trilha.getIdTrilha());
-        dto.setTitulo(trilha.getTitulo());
-        dto.setProgresso(trilha.getProgresso());
-        dto.setDataCriacao(trilha.getDataCriacao());
-        dto.setDataAtualizacao(trilha.getDataAtualizacao());
-        dto.setUsuarioId(trilha.getUsuario().getId());
-        return dto;
     }
 }
