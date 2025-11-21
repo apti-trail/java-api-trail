@@ -55,7 +55,7 @@ public class AnotacaoController {
     @Path("/{id}")
     public Response editarAnotacao(@PathParam("id") Long id, AnotacaoDTO anotacaoDTO) {
         try {
-            
+
             Anotacao anotacaoExistente = anotacaoService.buscarPorId(id).orElse(null);
 
             if (anotacaoExistente == null) {
