@@ -1,8 +1,11 @@
 package br.com.fiap.infrastructure;
 
 import br.com.fiap.domain.model.Chat;
+import br.com.fiap.domain.model.Usuario;
 import br.com.fiap.domain.repository.ChatRepository;
+import br.com.fiap.domain.repository.UsuarioRepository;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -15,6 +18,9 @@ public class JdbcChatRepository implements ChatRepository {
 
 
     private final DatabaseConnection databaseConnection;
+
+    @Inject
+    UsuarioRepository usuarioRepository;
 
     public JdbcChatRepository(DatabaseConnection databaseConnection) {
         this.databaseConnection = databaseConnection;
@@ -112,12 +118,22 @@ public class JdbcChatRepository implements ChatRepository {
 
         Timestamp dataCriacao = resultSet.getTimestamp("DT_CRIACAO");
         if (dataCriacao != null) {
-            chat.setDataCriacao(LocalDate.from(dataCriacao.toLocalDateTime()));
+            chat.setDataCriacao(dataCriacao.toLocalDateTime().toLocalDate());
         }
 
         Timestamp dataAtualizacao = resultSet.getTimestamp("DT_ATUALIZACAO");
         if (dataAtualizacao != null) {
-            chat.setDataAtualizacao(LocalDate.from(dataAtualizacao.toLocalDateTime()));
+            chat.setDataAtualizacao(dataAtualizacao.toLocalDateTime().toLocalDate());
+        }
+
+        Long usuarioId = resultSet.getLong("T_APTI_USUARIO_ID_USUARIO");
+        if (usuarioId > 0) {
+            try {
+                Optional<Usuario> usuarioOpt = usuarioRepository.buscarPorId(usuarioId);
+                usuarioOpt.ifPresent(chat::setUsuario);
+            } catch (Exception e) {
+                System.err.println("Erro ao carregar usuário ID: " + usuarioId + " - " + e.getMessage());
+            }
         }
 
         return chat;

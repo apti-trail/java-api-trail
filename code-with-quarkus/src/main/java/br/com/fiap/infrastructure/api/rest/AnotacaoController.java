@@ -50,6 +50,40 @@ public class AnotacaoController {
         }
     }
 
+
+    @PUT
+    @Path("/{id}")
+    public Response editarAnotacao(@PathParam("id") Long id, AnotacaoDTO anotacaoDTO) {
+        try {
+            
+            Anotacao anotacaoExistente = anotacaoService.buscarPorId(id).orElse(null);
+
+            if (anotacaoExistente == null) {
+                anotacaoExistente = new Anotacao();
+                anotacaoExistente.setIdAnotacao(id);
+            }
+
+            anotacaoExistente.setTitulo(anotacaoDTO.getTitulo());
+            anotacaoExistente.setConteudo(anotacaoDTO.getConteudo());
+
+            Anotacao anotacaoAtualizada = anotacaoService.salvar(anotacaoExistente);
+
+            AnotacaoDTO responseDTO = new AnotacaoDTO();
+            responseDTO.setIdAnotacao(anotacaoAtualizada.getIdAnotacao());
+            responseDTO.setTitulo(anotacaoAtualizada.getTitulo());
+            responseDTO.setConteudo(anotacaoAtualizada.getConteudo());
+            responseDTO.setDataCriacao(anotacaoAtualizada.getDataCriacao());
+            responseDTO.setUsuarioId(anotacaoAtualizada.getUsuario().getId());
+
+            return Response.ok(responseDTO).build();
+
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Erro ao editar anotação: " + e.getMessage()).build();
+        }
+    }
+
+
     @GET
     @Path("/{id}")
     public Response buscarAnotacao(@PathParam("id") Long id) {

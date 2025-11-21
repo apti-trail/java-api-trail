@@ -1,8 +1,11 @@
 package br.com.fiap.infrastructure;
 
 import br.com.fiap.domain.model.Modulo;
+import br.com.fiap.domain.model.Trilha;
 import br.com.fiap.domain.repository.ModuloRepository;
+import br.com.fiap.domain.repository.TrilhaRepository;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -14,6 +17,9 @@ import java.util.Optional;
 public class JdbcModuloRepository implements ModuloRepository {
 
     private final DatabaseConnection databaseConnection;
+
+    @Inject
+    TrilhaRepository trilhaRepository;
 
     public JdbcModuloRepository(DatabaseConnection databaseConnection) {
         this.databaseConnection = databaseConnection;
@@ -132,6 +138,7 @@ public class JdbcModuloRepository implements ModuloRepository {
         return Optional.empty();
     }
 
+    @Override
     public Modulo mapearModulo(ResultSet resultSet) throws SQLException {
         Modulo modulo = new Modulo();
         modulo.setIdModulo(resultSet.getLong("ID_MODULO"));
@@ -142,9 +149,19 @@ public class JdbcModuloRepository implements ModuloRepository {
         String concluido = resultSet.getString("CONCLUIDO");
         modulo.setConcluido("S".equals(concluido));
 
-        Timestamp dataConclusao = resultSet.getTimestamp("DT_CONCLUSAO");
+        Date dataConclusao = resultSet.getDate("DT_CONCLUSAO");
         if (dataConclusao != null) {
-            modulo.setDataConclusao(LocalDate.from(dataConclusao.toLocalDateTime()));
+            modulo.setDataConclusao(dataConclusao.toLocalDate());
+        }
+
+        Long trilhaId = resultSet.getLong("T_APTI_TRILHA_ID_TRILHA");
+        if (trilhaId != null && trilhaId > 0) {
+            try {
+                Optional<Trilha> trilhaOpt = trilhaRepository.buscarPorId(trilhaId);
+                trilhaOpt.ifPresent(modulo::setTrilha);
+            } catch (Exception e) {
+                System.err.println("Erro ao carregar trilha ID: " + trilhaId + " - " + e.getMessage());
+            }
         }
 
         return modulo;

@@ -4,15 +4,17 @@ public class UsuarioDTO {
     private Long id;
     private String username;
     private String email;
+    private String senha;
 
 
     public UsuarioDTO() {
     }
 
-    public UsuarioDTO(Long id, String username, String email) {
+    public UsuarioDTO(Long id, String username, String email, String senha) {
         this.id = id;
         this.username = username;
         this.email = email;
+        this.senha = null;
     }
 
 
@@ -38,5 +40,13 @@ public class UsuarioDTO {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getSenha() {
+        return senha;
+    }
+
+    public void setSenha(String senha) {
+        this.senha = senha;
     }
 }

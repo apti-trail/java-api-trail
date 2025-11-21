@@ -16,4 +16,5 @@ public interface TrilhaRepository {
     Optional<Trilha> buscarPorId(Long id);
 
     Trilha mapearTrilha(ResultSet resultSet) throws SQLException;
+    List<Trilha> buscarPorUsuario(Long usuarioId);
 }

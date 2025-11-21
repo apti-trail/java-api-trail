@@ -22,17 +22,24 @@ public class UsuarioController {
     @POST
     public Response criarUsuario(UsuarioDTO usuarioDTO) {
         try {
+            // Validação básica dos campos obrigatórios
+            if (usuarioDTO.getUsername() == null || usuarioDTO.getEmail() == null || usuarioDTO.getSenha() == null) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("Username, email e senha são obrigatórios").build();
+            }
+
             Usuario usuario = new Usuario();
             usuario.setUsername(usuarioDTO.getUsername());
             usuario.setEmail(usuarioDTO.getEmail());
-            usuario.setSenha("senha_default");
+            usuario.setSenha(usuarioDTO.getSenha());
 
             Usuario usuarioSalvo = usuarioService.salvar(usuario);
 
             UsuarioDTO responseDTO = new UsuarioDTO(
                     usuarioSalvo.getId(),
                     usuarioSalvo.getUsername(),
-                    usuarioSalvo.getEmail()
+                    usuarioSalvo.getEmail(),
+                    null
             );
 
             return Response.status(Response.Status.CREATED).entity(responseDTO).build();
@@ -47,7 +54,7 @@ public class UsuarioController {
     public Response buscarUsuario(@PathParam("id") Long id) {
         try {
             return usuarioService.buscarPorId(id)
-                    .map(usuario -> new UsuarioDTO(usuario.getId(), usuario.getUsername(), usuario.getEmail()))
+                    .map(usuario -> new UsuarioDTO(usuario.getId(), usuario.getUsername(), usuario.getEmail(), usuario.getSenha()))
                     .map(dto -> Response.ok(dto).build())
                     .orElse(Response.status(Response.Status.NOT_FOUND).build());
         } catch (Exception e) {
@@ -60,7 +67,7 @@ public class UsuarioController {
     public Response listarUsuarios() {
         try {
             List<UsuarioDTO> usuarios = usuarioService.listarTodos().stream()
-                    .map(usuario -> new UsuarioDTO(usuario.getId(), usuario.getUsername(), usuario.getEmail()))
+                    .map(usuario -> new UsuarioDTO(usuario.getId(), usuario.getUsername(), usuario.getEmail(), usuario.getSenha()))
                     .collect(Collectors.toList());
             return Response.ok(usuarios).build();
         } catch (Exception e) {
@@ -77,11 +84,17 @@ public class UsuarioController {
                     .map(usuario -> {
                         usuario.setUsername(usuarioDTO.getUsername());
                         usuario.setEmail(usuarioDTO.getEmail());
+
+                        if (usuarioDTO.getSenha() != null && !usuarioDTO.getSenha().trim().isEmpty()) {
+                            usuario.setSenha(usuarioDTO.getSenha());
+                        }
+
                         Usuario usuarioAtualizado = usuarioService.salvar(usuario);
                         UsuarioDTO responseDTO = new UsuarioDTO(
                                 usuarioAtualizado.getId(),
                                 usuarioAtualizado.getUsername(),
-                                usuarioAtualizado.getEmail()
+                                usuarioAtualizado.getEmail(),
+                                null
                         );
                         return Response.ok(responseDTO).build();
                     })
@@ -111,7 +124,7 @@ public class UsuarioController {
             boolean loginValido = usuarioService.validarLogin(loginDTO.getEmail(), loginDTO.getSenha());
             if (loginValido) {
                 return usuarioService.buscarPorEmail(loginDTO.getEmail())
-                        .map(usuario -> new UsuarioDTO(usuario.getId(), usuario.getUsername(), usuario.getEmail()))
+                        .map(usuario -> new UsuarioDTO(usuario.getId(), usuario.getUsername(), usuario.getEmail(), usuario.getSenha()))
                         .map(dto -> Response.ok(dto).build())
                         .orElse(Response.status(Response.Status.UNAUTHORIZED).build());
             }

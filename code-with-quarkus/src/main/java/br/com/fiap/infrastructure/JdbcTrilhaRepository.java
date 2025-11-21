@@ -1,8 +1,11 @@
 package br.com.fiap.infrastructure;
 
 import br.com.fiap.domain.model.Trilha;
+import br.com.fiap.domain.model.Usuario;
 import br.com.fiap.domain.repository.TrilhaRepository;
+import br.com.fiap.domain.repository.UsuarioRepository;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -14,10 +17,12 @@ public class JdbcTrilhaRepository implements TrilhaRepository {
 
     private final DatabaseConnection databaseConnection;
 
+    @Inject
+    UsuarioRepository usuarioRepository;
+
     public JdbcTrilhaRepository(DatabaseConnection databaseConnection) {
         this.databaseConnection = databaseConnection;
     }
-
 
     @Override
     public Trilha salvarTrilha(Trilha trilha) {
@@ -145,7 +150,39 @@ public class JdbcTrilhaRepository implements TrilhaRepository {
             trilha.setDataAtualizacao(dataAtualizacao.toLocalDate());
         }
 
+        Long usuarioId = resultSet.getLong("T_APTI_USUARIO_ID_USUARIO");
+        if (usuarioId != 0) {
+            Optional<Usuario> usuarioOpt = usuarioRepository.buscarPorId(usuarioId);
+            usuarioOpt.ifPresent(trilha::setUsuario);
+        }
+
         return trilha;
+    }
+
+    @Override
+    public List<Trilha> buscarPorUsuario(Long usuarioId) {
+        String sql = "SELECT ID_TRILHA, TITULO_TRILHA, PROGRESSO, DT_CRIACAO, DT_ATUALIZACAO, T_APTI_USUARIO_ID_USUARIO " +
+                "FROM T_APTI_TRILHA WHERE T_APTI_USUARIO_ID_USUARIO = ? ORDER BY DT_ATUALIZACAO DESC";
+
+        List<Trilha> trilhas = new ArrayList<>();
+
+        try (Connection conn = this.databaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, usuarioId);
+
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                while (resultSet.next()) {
+                    Trilha trilha = mapearTrilha(resultSet);
+                    trilhas.add(trilha);
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao buscar trilhas por usuário: " + usuarioId, e);
+        }
+
+        return trilhas;
     }
 
 }

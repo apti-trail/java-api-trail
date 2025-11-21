@@ -1,8 +1,11 @@
 package br.com.fiap.infrastructure;
 
 import br.com.fiap.domain.model.Anotacao;
+import br.com.fiap.domain.model.Usuario;
 import br.com.fiap.domain.repository.AnotacaoRepository;
+import br.com.fiap.domain.repository.UsuarioRepository;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -14,9 +17,12 @@ public class JdbcAnotacaoRepository implements AnotacaoRepository {
 
 
     private final DatabaseConnection databaseConnection;
+    private final UsuarioRepository usuarioRepository;
 
-    public JdbcAnotacaoRepository(DatabaseConnection databaseConnection) {
+    @Inject
+    public JdbcAnotacaoRepository(DatabaseConnection databaseConnection, UsuarioRepository usuarioRepository) {
         this.databaseConnection = databaseConnection;
+        this.usuarioRepository = usuarioRepository;
     }
 
 
@@ -134,6 +140,16 @@ public class JdbcAnotacaoRepository implements AnotacaoRepository {
         Date dataCriacao = resultSet.getDate("DT_CRIACAO");
         if (dataCriacao != null) {
             anotacao.setDataCriacao(dataCriacao.toLocalDate());
+        }
+
+        Long usuarioId = resultSet.getLong("T_APTI_USUÁRIO_ID_USUARIO");
+        if (!resultSet.wasNull() && usuarioId > 0) {
+            try {
+                Optional<Usuario> usuario = usuarioRepository.buscarPorId(usuarioId);
+                usuario.ifPresent(anotacao::setUsuario);
+            } catch (Exception e) {
+                System.err.println("Erro ao carregar usuário ID: " + usuarioId + " - " + e.getMessage());
+            }
         }
 
         return anotacao;

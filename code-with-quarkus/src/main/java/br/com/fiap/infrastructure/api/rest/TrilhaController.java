@@ -74,6 +74,32 @@ public class TrilhaController {
         }
     }
 
+
+    @GET
+    @Path("/usuario/{usuarioId}")
+    public Response buscarTrilhasPorUsuario(@PathParam("usuarioId") Long usuarioId) {
+        try {
+            List<TrilhaDTO> trilhas = trilhaService.buscarPorUsuario(usuarioId).stream()
+                    .map(trilha -> {
+                        TrilhaDTO dto = new TrilhaDTO();
+                        dto.setIdTrilha(trilha.getIdTrilha());
+                        dto.setTitulo(trilha.getTitulo());
+                        dto.setProgresso(trilha.getProgresso());
+                        dto.setDataCriacao(trilha.getDataCriacao());
+                        dto.setDataAtualizacao(trilha.getDataAtualizacao());
+                        dto.setUsuarioId(trilha.getUsuario().getId());
+                        return dto;
+                    })
+                    .collect(Collectors.toList());
+
+            return Response.ok(trilhas).build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Erro ao buscar trilhas do usuário: " + e.getMessage()).build();
+        }
+    }
+
+
     @GET
     public Response listarTrilhas() {
         try {

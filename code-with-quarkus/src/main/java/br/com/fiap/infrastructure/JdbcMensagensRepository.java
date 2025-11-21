@@ -1,8 +1,11 @@
 package br.com.fiap.infrastructure;
 
+import br.com.fiap.domain.model.Chat;
 import br.com.fiap.domain.model.Mensagens;
+import br.com.fiap.domain.repository.ChatRepository;
 import br.com.fiap.domain.repository.MensagensRepository;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -13,6 +16,9 @@ import java.util.Optional;
 public class JdbcMensagensRepository implements MensagensRepository {
 
     private final DatabaseConnection databaseConnection;
+
+    @Inject
+    ChatRepository chatRepository;
 
     public JdbcMensagensRepository(DatabaseConnection databaseConnection) {
         this.databaseConnection = databaseConnection;
@@ -137,6 +143,16 @@ public class JdbcMensagensRepository implements MensagensRepository {
 
         String isUsuario = resultSet.getString("IS_USUARIO");
         mensagem.setIsUsuario("S".equals(isUsuario));
+
+        Long chatId = resultSet.getLong("T_APTI_CHAT_ID_CHAT");
+        if (chatId > 0) {
+            try {
+                Optional<Chat> chatOpt = chatRepository.buscarPorId(chatId);
+                chatOpt.ifPresent(mensagem::setChat);
+            } catch (Exception e) {
+                System.err.println("Erro ao carregar chat ID: " + chatId + " - " + e.getMessage());
+            }
+        }
 
         return mensagem;
     }
